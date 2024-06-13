@@ -31,7 +31,9 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+extern DMA_HandleTypeDef hdma_memtomem_dma1_channel1;
+extern uint8_t CDC_Rx_Buffer[64];
+extern uint8_t CDC_Rx_Done;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -263,7 +265,8 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
 
-  CDC_Transmit_FS(Buf, *Len);
+  HAL_DMA_Start(&hdma_memtomem_dma1_channel1,(uint32_t)Buf, (uint32_t)CDC_Rx_Buffer, *Len);
+  CDC_Rx_Done = 1;
 
   return (USBD_OK);
   /* USER CODE END 6 */
