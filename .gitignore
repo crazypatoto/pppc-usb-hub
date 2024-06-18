@@ -4,6 +4,7 @@
 [Rr]elease
 [Dd]ebug
 .launch
+*.bak
 
 
 .rar
