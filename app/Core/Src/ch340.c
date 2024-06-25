@@ -34,12 +34,12 @@ void CH340_Requset_Handle(USBD_HandleTypeDef *pdev,
 		switch (wValue) {
 		// Initialize
 		case 0x0000:
-			ch341_state = 0xdeff;
-			ch341_2C2C = 0x0B0B;
+//			ch341_state = 0xdeff;
+//			ch341_2C2C = 0x0B0B;
 			break;
 		// Open port, configure baud, stop bits ...
 		case 0xC39C:
-			ch341_2C2C = 0x8888;
+//			ch341_2C2C = 0x8888;
 			break;
 		case 0x0F2C:
 			switch(req->wIndex){
@@ -63,8 +63,8 @@ void CH340_Requset_Handle(USBD_HandleTypeDef *pdev,
 	case CMD_W:
 		switch (wValue) {
 		case 0x1312:
-			if(req->wIndex)
-				ch341_2C2C = 0x0707;
+//			if(req->wIndex)
+//				ch341_2C2C = 0x0707;
 			break;
 		// Set CRTSCTS
 		case 0x2727:

@@ -49,7 +49,8 @@
 /* USER CODE BEGIN PV */
 extern TIM_HandleTypeDef htim3;
 uint8_t CDC_Rx_Buffer[64] = { 0 };
-int rx_count = 0;
+uint8_t rx_count = 0;
+uint8_t IO_state = 0;
 volatile uint8_t IO_Ctrl_Flag = 0x00;
 /* USER CODE END PV */
 
@@ -167,13 +168,67 @@ void SystemClock_Config(void) {
 void Enable_All_IOs() {
 
 	IO_Ctrl_Flag = 0x11;
-
+	IO_state = 0x01;
 }
 
 void Disable_All_IOs() {
 
 	IO_Ctrl_Flag = 0x01;
+    IO_state = 0x00;
+}
 
+void IO_Ctrl_Handler() {
+	static uint8_t cooldown = 0;
+
+	if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8) && (cooldown == 0))
+	{
+		if(IO_state){
+			Disable_All_IOs();
+		}else{
+			Enable_All_IOs();
+		}
+		cooldown = 10;
+	}
+
+	switch (IO_Ctrl_Flag) {
+	case 0x01:
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+		IO_Ctrl_Flag += 1;
+		break;
+	case 0x02:
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+		IO_Ctrl_Flag += 1;
+		break;
+	case 0x03:
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+		IO_Ctrl_Flag += 1;
+		break;
+	case 0x04:
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+		IO_Ctrl_Flag = 0x00;
+		break;
+	case 0x11:
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+		IO_Ctrl_Flag += 1;
+		break;
+	case 0x12:
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+		IO_Ctrl_Flag += 1;
+		break;
+	case 0x13:
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+		IO_Ctrl_Flag += 1;
+		break;
+	case 0x14:
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+		IO_Ctrl_Flag = 0x00;
+		break;
+	default:
+		IO_Ctrl_Flag = 0x00;
+		break;
+	}
+
+	cooldown -= cooldown ? 1 : 0;
 }
 /* USER CODE END 4 */
 
